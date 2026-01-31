@@ -35,17 +35,17 @@ func (repo *CategoryRepository) GetAll() ([]models.Category, error) {
 }
 
 func (repo *CategoryRepository) Create(category *models.Category) error {
-	query := "INSERT INTO categories (name) VALUES ($1) RETURNING id"
-	err := repo.db.QueryRow(query, category.Name).Scan(&category.ID)
+	query := "INSERT INTO categories (name, description) VALUES ($1, $2) RETURNING id"
+	err := repo.db.QueryRow(query, category.Name, category.Description).Scan(&category.ID)
 	return err
 }
 
 // GetByID - ambil kategori by ID
 func (repo *CategoryRepository) GetByID(id int) (*models.Category, error) {
-	query := "SELECT id, name FROM categories WHERE id = $1"
+	query := "SELECT id, name, description FROM categories WHERE id = $1"
 
 	var p models.Category
-	err := repo.db.QueryRow(query, id).Scan(&p.ID, &p.Name)
+	err := repo.db.QueryRow(query, id).Scan(&p.ID, &p.Name, &p.Description)
 	if err == sql.ErrNoRows {
 		return nil, errors.New("kategori tidak ditemukan")
 	}
@@ -57,8 +57,8 @@ func (repo *CategoryRepository) GetByID(id int) (*models.Category, error) {
 }
 
 func (repo *CategoryRepository) Update(category *models.Category) error {
-	query := "UPDATE categories SET name = $1 WHERE id = $2"
-	result, err := repo.db.Exec(query, category.Name, category.ID)
+	query := "UPDATE categories SET name = $1, description = $2 WHERE id = $3"
+	result, err := repo.db.Exec(query, category.Name, category.Description, category.ID)
 	if err != nil {
 		return err
 	}
