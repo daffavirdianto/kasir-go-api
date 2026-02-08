@@ -14,8 +14,8 @@ func NewProductService(repo *repositories.ProductRepository) *ProductService {
 	return &ProductService{repo: repo}
 }
 
-func (s *ProductService) GetAll() ([]models.ProductResponse, error) {
-	data, err := s.repo.GetAll()
+func (s *ProductService) GetAll(name string) ([]models.ProductResponse, error) {
+	data, err := s.repo.GetAll(name)
 	if err != nil {
 		return nil, err
 	}
