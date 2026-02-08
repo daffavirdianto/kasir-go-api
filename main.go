@@ -42,19 +42,31 @@ func main() {
 	}
 	defer db.Close()
 
-	// Initialize repositories, services, and handlers
+	// Products
 	productRepo := repositories.NewProductRepository(db)
 	productService := services.NewProductService(productRepo)
 	productHandler := handlers.NewProductHandler(productService)
+	http.HandleFunc("/api/products", productHandler.HandleProducts)
+	http.HandleFunc("/api/products/", productHandler.HandleProductByID)
+
+	// Categories
 	categoryRepo := repositories.NewCategoryRepository(db)
 	categoryService := services.NewCategoryService(categoryRepo)
 	categoryHandler := handlers.NewCategoryHandler(categoryService)
-
-	// Setup routes
-	http.HandleFunc("/api/products", productHandler.HandleProducts)
-	http.HandleFunc("/api/products/", productHandler.HandleProductByID)
 	http.HandleFunc("/api/categories", categoryHandler.HandleCategories)
 	http.HandleFunc("/api/categories/", categoryHandler.HandleCategoryByID)
+
+	// Transactions
+	transactionRepo := repositories.NewTransactionRepository(db)
+	transactionService := services.NewTransactionService(transactionRepo)
+	transactionHandler := handlers.NewTransactionHandler(transactionService)
+	http.HandleFunc("/api/checkout", transactionHandler.HandleCheckout)
+
+	// Reports
+	reportService := services.NewReportService(transactionRepo)
+	reportHandler := handlers.NewReportHandler(reportService)
+	http.HandleFunc("/api/report", reportHandler.HandleReport)
+	http.HandleFunc("/api/report/today", reportHandler.HandleReport)
 
 	// configure health check endpoint
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

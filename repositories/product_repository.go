@@ -19,9 +19,15 @@ type ProductWithCategory struct {
 	CategoryName string
 }
 
-func (repo *ProductRepository) GetAll() ([]ProductWithCategory, error) {
+func (repo *ProductRepository) GetAll(name string) ([]ProductWithCategory, error) {
 	query := "SELECT p.id, p.name, p.price, p.stock, p.category_id, c.name FROM products p JOIN categories c ON p.category_id = c.id"
-	rows, err := repo.db.Query(query)
+
+	var args []interface{}
+	if name != "" {
+		query += " WHERE p.name ILIKE $1"
+		args = append(args, "%"+name+"%")
+	}
+	rows, err := repo.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
